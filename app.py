@@ -76,27 +76,33 @@ if st.button("Predict Health Score"):
     # ---------- INSIGHTS ----------
     st.subheader("💡 Personalized Insights")
 
-    issues = []
+    penalty = 0
 
-    # Check each input
-    if bmi > 25:
-        issues.append("⚠️ High BMI - consider weight management")
+    # BMI
+    if bmi < 18.5 or bmi > 25:
+        st.write("⚠️ BMI is not in healthy range")
+        penalty += 10
 
-    if sleep < 6:
-        issues.append("😴 Low sleep - aim for 7-8 hours")
+    # Sleep
+    if sleep < 7 or sleep > 8:
+        st.write("😴 Sleep schedule is not optimal (7–8 hrs recommended)")
+        penalty += 10
 
+    # Exercise
     if exercise < 3:
-        issues.append("🏃 Low physical activity - increase exercise frequency")
+        st.write("🏃 Increase exercise frequency")
+        penalty += 10
 
+    # Diet
     if diet <= 2:
-        issues.append("🥗 Poor diet quality - improve nutrition and food choices")
+        st.write("🥗 Poor diet quality - improve nutrition")
+        penalty += 15
 
-    # Show insights
-    if len(issues) == 0:
-        st.success("Great lifestyle! Keep it up ✅")
-    else:
-        for issue in issues:
-            st.write(issue)
+    # Adjust score
+    adjusted_score = max(0, result - penalty)
+
+    st.subheader("🎯 Adjusted Health Score")
+    st.write(f"{adjusted_score:.2f}")
 
     # ---------- USER INPUT SUMMARY ----------
     st.subheader("📌 Your Inputs")
