@@ -8,7 +8,7 @@ import pandas as pd
 st.set_page_config(page_title="AI Health Predictor", layout="centered")
 
 # Load model
-model_path = os.path.join(os.path.dirname(__file__), "../model/model.pkl")
+model_path = os.path.join(os.getcwd(), "model/model.pkl")
 model = joblib.load(model_path)
 
 # ---------- HEADER ----------
