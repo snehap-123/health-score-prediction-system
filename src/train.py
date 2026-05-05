@@ -3,19 +3,41 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 import joblib
+import numpy as np
 
 # Load data
 data = pd.read_csv("../data/health_data.csv")
 
 # Features
 # Create target column (Health Score)
-data['Health_Score'] = (
-    (100 - data['BMI']) * 0.3 +
-    data['Sleep_Hours'] * 5 +
-    data['Exercise_Frequency'] * 10 +
-    data['Diet_Quality'] * 2
-)
+def calculate_health_score(row):
+    score = 100
 
+    # BMI penalty
+    if row["BMI"] > 25:
+        score -= (row["BMI"] - 25) * 1.5
+    elif row["BMI"] < 18.5:
+        score -= (18.5 - row["BMI"]) * 1.5
+
+    # Sleep penalty (ideal 7-8)
+    if row["Sleep_Hours"] < 7:
+        score -= (7 - row["Sleep_Hours"]) * 2
+    elif row["Sleep_Hours"] > 8:
+        score -= (row["Sleep_Hours"] - 8) * 2
+
+    # Exercise penalty (ideal 3-5)
+    if row["Exercise_Frequency"] < 3:
+        score -= (3 - row["Exercise_Frequency"]) * 3
+    elif row["Exercise_Frequency"] > 5:
+        score -= (row["Exercise_Frequency"] - 5) * 1.5
+
+    # Diet contribution
+    score += row["Diet_Quality"] * 4
+
+    return max(0, min(100, score))  # keep between 0-100
+
+# Apply
+data["Health_Score"] = data.apply(calculate_health_score, axis=1)
 # Features
 X = data[['Age', 'BMI', 'Sleep_Hours', 'Exercise_Frequency', 'Diet_Quality']]
 y = data['Health_Score']
